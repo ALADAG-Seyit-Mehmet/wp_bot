@@ -1,6 +1,6 @@
 module.exports = {
     // Exact name of the group the bot should manage
-    TARGET_GROUP_NAME: "Bot Test Group",
+    TARGET_GROUP_NAME: "Steam Türkiye Topluluğu🇹🇷",
 
     // Auto-Approve Settings (Gatekeeper)
     // 90 (TR), 994 (AZ), 993 (TM), 998 (UZ), 996 (KG), 76/77 (KZ)

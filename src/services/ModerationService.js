@@ -9,7 +9,7 @@ class ModerationService {
         const chat = await msg.getChat();
 
         // Skip if not group or not target group (optional specific check)
-        // if (chat.name !== config.TARGET_GROUP_NAME) return;
+        if (chat.name !== config.TARGET_GROUP_NAME) return;
 
         const senderId = msg.author || msg.from;
 

@@ -45,7 +45,7 @@ client.on('ready', () => {
 client.on('group_membership_request', async (notification) => {
     // Only handle requests for the target group (if checked)
     const chat = await notification.getChat();
-    // if (chat.name !== config.TARGET_GROUP_NAME) return; 
+    if (chat.name !== config.TARGET_GROUP_NAME) return;
 
     // console.log("Incoming join request from:", notification.author);
 
