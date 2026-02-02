@@ -4,10 +4,12 @@ const fs = require('fs');
 const path = require('path');
 const config = require('./config');
 
+const os = require('os');
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
-        headless: false, // Show the browser to user (helps with stability on Windows)
+        // Headless TRUE on Linux (Server), FALSE on Windows (Validation)
+        headless: os.platform() !== 'win32',
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
