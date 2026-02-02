@@ -1,21 +1,21 @@
 module.exports = {
-    name: 'stats',
-    description: 'Shows group statistics',
-    adminOnly: true,
+    name: 'istatistik',
+    description: 'Grup istatistiklerini gösterir',
+    adminOnly: false,
     async run(client, msg, args) {
         const chat = await msg.getChat();
 
         if (!chat.isGroup) {
-            return msg.reply('❌ This command can only be used in groups.');
+            return msg.reply('❌ Bu komut sadece gruplarda kullanılabilir.');
         }
 
         const stats = `
-📊 *Group Statistics*
+📊 *Grup İstatistikleri*
 ━━━━━━━━━━━━━━━━
-🏷️ *Name*: ${chat.name}
-👥 *Participants*: ${chat.participants.length}
-📅 *Created At*: ${new Date(chat.timestamp * 1000).toLocaleDateString()}
-📝 *Description*: ${chat.description || 'None'}
+🏷️ *İsim*: ${chat.name}
+👥 *Katılımcılar*: ${chat.participants.length}
+📅 *Kuruluş*: ${new Date((chat.createdAt || chat.timestamp) * 1000).toLocaleDateString('tr-TR')}
+📝 *Açıklama*: ${chat.description || 'Yok'}
         `;
 
         msg.reply(stats.trim());

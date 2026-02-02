@@ -1,6 +1,6 @@
 module.exports = {
-    name: 'kick',
-    description: 'Kicks a user from the group.',
+    name: 'at',
+    description: 'Kullanıcıyı gruptan atar',
     adminOnly: true,
     async run(client, msg, args) {
         if (!msg.hasQuotedMsg && args.length === 0) {

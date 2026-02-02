@@ -1,6 +1,10 @@
 module.exports = {
-    // Exact name of the group the bot should manage
-    TARGET_GROUP_NAME: "Steam Türkiye Topluluğu🇹🇷",
+    // Exact names of the groups the bot should manage
+    TARGET_GROUPS: [
+        "Steam Türkiye Topluluğu🇹🇷",
+        "Epic Games Sohbet Grubu",
+        "Türk Oyuncular Derneği🇹🇷"
+    ],
 
     // Auto-Approve Settings (Gatekeeper)
     // 90 (TR), 994 (AZ), 993 (TM), 998 (UZ), 996 (KG), 76/77 (KZ)
@@ -10,38 +14,44 @@ module.exports = {
     BANNED_WORDS: [
         // --- High Priority (Shorts) ---
         "aq", "amk", "mk", "mq", "awk", "a.q", "a.m.k", "a.k",
-        "@q", "@mk", "@mq", "4mk", "4q", "aqk",
-        "sie", "s.i.e", "si.e",
+        "@q", "@mk", "@mq", "4mk", "4q", "aqk", "amq",
+        "sie", "s.i.e", "si.e", "siktirgit", "siktir git",
 
         // --- Variatons of OÇ ---
         "oç", "oc", "o.ç", "o.c", "0ç", "0c", "o ç", "o c",
-        "orospu", "orospu cocugu", "orospu çocuğu", "o.çocuğu",
-        "oro5pu", "0rospu", "or0spu", "orospw",
+        "orospu", "orospu cocugu", "orospu çocuğu", "o.çocuğu", "o.cocugu",
+        "oro5pu", "0rospu", "or0spu", "orospw", "evladı", "veledi zina",
 
         // --- S-Word Variations ---
         "sik", "s1k", "s!k", "skim", "sık", "s1k",
         "siktir", "siktır", "s1ktir", "s!ktir", "siktr", "s.k",
-        "sikerim", "s1kerim", "s.ikerim", "s.kerim",
-        "sokarım", "sakarım", "sokayım", "sokam", "s0karım",
+        "sikerim", "s1kerim", "s.ikerim", "s.kerim", "sikem",
+        "sokarım", "sakarım", "sokayım", "sokam", "s0karım", "sokuk", "yarak",
 
         // --- A-Word Elements ---
-        "amcık", "amcık", "amcik", "amc!k", "amc1k",
-        "amın", "amina", "amına", "am1na", "am!na",
-        "anani", "ananı", "anan1", "anana",
+        "amcık", "amcik", "amc!k", "amc1k",
+        "amın", "amina", "amına", "am1na", "am!na", "amk",
+        "anani", "ananı", "anan1", "anana", "bacını", "bacini",
+        "yarrak", "y4rrak", "y4rak", "yarram", "yarrram",
 
-        // --- Other Heavy Profanity ---
-        "yarrak", "yarak", "y4rrak", "y4rak", "yarram",
-        "piç", "pic", "p!ç", "p1ç", "p.i.c",
-        "göt", "got", "g0t", "g.o.t", "g.ö.t",
+        // --- Insults (Person) ---
+        "piç", "pic", "p!ç", "p1ç", "p.i.c", "piç kurusu",
+        "göt", "got", "g0t", "g.o.t", "g.ö.t", "götveren", "götoş",
         "gavat", "kavat", "g4vat",
-        "ibne", "1bne", "ibn3",
+        "ibne", "1bne", "ibn3", "puşt",
         "kahpe", "k4hpe",
         "kaltak", "k4ltak",
         "yavşak", "yavsak", "y4vşak",
         "dalyarak",
-        "pezevenk", "pezeveng"
+        "pezevenk", "pezeveng",
+        "beyinsiz", "gerizekalı", "aptal", "salak", "mal", "keko", "yıkık", "ezik", // Community choice: sometimes valid insults
 
-        // REMOVED: mal, salak, gerizekalı, aptal, hıyar, keko, etc.
+        // --- Religious / Values Insults (Extreme) ---
+        "allahını", "allahini", "kitabını", "kitabini", "dinini", "imanını", // Usually preceded by curse
+        "atatürk'e", "ataturke", "ataturk'e", // Disrespect checks usually complex but banning specific insult phrases helps
+
+        // --- English Common ---
+        "fuck", "shit", "bitch", "asshole", "dick", "cunt", "pussy", "bastard", "whore", "slut"
     ],
 
     ADULT_WORDS: [
@@ -86,7 +96,7 @@ module.exports = {
         "terör", "teror", "terörist",
 
         // --- Politicians ---
-        "erdoğan", "erdogan", "tayyip", "rte", "reis",
+        "erdoğan", "erdogan", "tayyip", "rte",
         "kılıçdaroğlu", "kilicdaroglu", "kk", "bay kemal",
         "imamoğlu", "imamoglu", "ekrem",
         "mansur yavaş", "mansur",

@@ -7,8 +7,24 @@ const config = require('./config');
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
-        args: ['--no-sandbox']
-    }
+        headless: false, // Show the browser to user (helps with stability on Windows)
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--no-first-run',
+            '--no-zygote',
+            '--disable-gpu'
+        ],
+    },
+    // Force a specific version to prevent "Context Destroyed" errors
+    webVersionCache: {
+        type: 'remote',
+        remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html',
+    },
+    authTimeoutMs: 60000,
+    loadingScreen: true
 });
 
 // Collection to hold commands
@@ -35,23 +51,48 @@ client.on('qr', (qr) => {
     console.log('QR RECEIVED. Scan with WhatsApp.');
 });
 
+client.on('authenticated', () => {
+    console.log('[DEBUG] Authenticated via WhatsApp Web!');
+});
+
+client.on('auth_failure', (msg) => {
+    console.error('[ERROR] Authentication Failed:', msg);
+});
+
+client.on('loading_screen', (percent, message) => {
+    console.log(`[DEBUG] Loading: ${percent}% - ${message}`);
+});
+
 client.on('ready', () => {
     console.log('Bot is Ready and Online!');
+    console.log('------------------------------------------------');
+    console.log(`Target Groups:`);
+    config.TARGET_GROUPS.forEach(g => console.log(` - ${g}`));
+    console.log('------------------------------------------------');
     // Set Discord-like Presence
     client.setStatus('online');
 });
 
 // --- Join Request Gatekeeper ---
 client.on('group_membership_request', async (notification) => {
-    // Only handle requests for the target group (if checked)
+    // Only handle requests for the target groups
     const chat = await notification.getChat();
-    if (chat.name !== config.TARGET_GROUP_NAME) return;
+    // if (chat.name !== config.TARGET_GROUP_NAME) return; -> OLD
+    if (!config.TARGET_GROUPS.includes(chat.name)) return;
 
     // console.log("Incoming join request from:", notification.author);
 
-    // notification.author format: 905551234567@c.us
-    // We want to check the start of the number.
-    const senderNumber = notification.author.replace('@c.us', '');
+
+    // notification.author might be a LID (e.g. 123456@lid) which breaks country code checks.
+    // We must fetch the Contact object to get the real phone number.
+    let senderNumber;
+    try {
+        const contact = await notification.getContact();
+        senderNumber = contact.number; // This is the real number (e.g., 905551234567)
+    } catch (err) {
+        console.error("Failed to get contact for join request, falling back to ID:", err);
+        senderNumber = notification.author.replace('@c.us', '').replace('@lid', '');
+    }
 
     // Check if starts with allowed prefix
     const isAllowed = config.ALLOWED_PREFIXES.some(prefix => senderNumber.startsWith(prefix));
@@ -59,23 +100,50 @@ client.on('group_membership_request', async (notification) => {
     if (isAllowed) {
         try {
             await client.approveGroupMembershipRequests(notification.chatId, { requesterIds: [notification.author] });
-            console.log(`✅ Approved join request: ${senderNumber} (Allowed Country)`);
+            console.log(`✅ Approved join request: +${senderNumber} (Allowed Country)`);
         } catch (err) {
             console.error("Failed to approve:", err);
         }
     } else {
         try {
             await client.rejectGroupMembershipRequests(notification.chatId, { requesterIds: [notification.author] });
-            console.log(`⛔ Rejected join request: ${senderNumber} (Foreign Country)`);
+            console.log(`⛔ Rejected join request: +${senderNumber} (Foreign Country)`);
         } catch (err) {
             console.error("Failed to reject:", err);
         }
     }
 });
 
+// --- Welcome Message ---
+client.on('group_join', async (notification) => {
+    try {
+        const chat = await notification.getChat();
+
+        // Only welcome in target groups
+        if (!config.TARGET_GROUPS.includes(chat.name)) return;
+
+        // Don't welcome the bot itself
+        if (notification.id.participant === client.info.wid._serialized) return;
+
+        const contact = await client.getContactById(notification.id.participant);
+        const welcomeMsg = `👋 Hoşgeldin @${contact.id.user}, *${chat.name}* grubumuza!\n\nLütfen kuralları okumak için *!kurallar* komutunu kullanmayı unutma. Keyifli sohbetler! 😊`;
+
+        await chat.sendMessage(welcomeMsg, {
+            mentions: [contact]
+        });
+        console.log(`[JOIN] Welcomed ${contact.number} to ${chat.name}`);
+    } catch (err) {
+        console.error("Failed to send welcome message:", err);
+    }
+});
+
 client.on('message', async (msg) => {
     try {
         const chat = await msg.getChat();
+        const contact = await msg.getContact();
+
+        // DEBUG LOGGING
+        console.log(`[DEBUG] From: ${chat.name} | User: +${contact.number} (${contact.pushname || 'No Name'}) | Body: ${msg.body}`);
 
         // 0. Moderation Check (Spam, Content)
         // Returns true if processed/deleted, so we stop there.
@@ -92,6 +160,12 @@ client.on('message', async (msg) => {
             const commandName = args.shift().toLowerCase();
 
             if (client.commands.has(commandName)) {
+                // RESTRICT TO TARGET GROUPS
+                if (!config.TARGET_GROUPS.includes(chat.name)) {
+                    // console.log(`[DEBUG] Ignoring command "!${commandName}" from non-target group: ${chat.name}`);
+                    return;
+                }
+
                 const command = client.commands.get(commandName);
 
                 // Permission Check

@@ -1,8 +1,8 @@
 const StrikeService = require('../services/StrikeService');
 
 module.exports = {
-    name: 'unwarn',
-    description: 'Clears warnings for a user.',
+    name: 'uyarısil',
+    description: 'Uyarıyı siler',
     adminOnly: true,
     async run(client, msg, args) {
         if (!msg.hasQuotedMsg && args.length === 0) {

@@ -9,16 +9,21 @@ class ModerationService {
         const chat = await msg.getChat();
 
         // Skip if not group or not target group (optional specific check)
-        if (chat.name !== config.TARGET_GROUP_NAME) return;
+        if (!config.TARGET_GROUPS.includes(chat.name)) {
+            // console.log(`[DEBUG] Skipping moderation. Chat: "${chat.name}" is not in target list.`);
+            return;
+        }
 
         const senderId = msg.author || msg.from;
+        const contact = await msg.getContact();
+        const userLogName = `+${contact.number} (${contact.pushname || ''})`;
 
         // 1. Anti-Spam Check
         if (this.isSpam(senderId)) {
             // Instant Kick/Ban for spam
             try {
                 await chat.removeParticipants([senderId]);
-                await chat.sendMessage(`⛔ @${senderId.split('@')[0]} removed for spamming.`, { mentions: [senderId] });
+                await chat.sendMessage(`⛔ @${senderId.split('@')[0]} spam yaptığı için atıldı.`, { mentions: [senderId] });
             } catch (e) {
                 console.error("Failed to kick spammer", e);
             }
@@ -37,7 +42,7 @@ class ModerationService {
                         await msg.delete(true);
                         // Instant Ban for Porn
                         await chat.removeParticipants([senderId]);
-                        await chat.sendMessage(`⛔ @${senderId.split('@')[0]} banned for sending +18 content (${nsfwReason}).`, { mentions: [senderId] });
+                        await chat.sendMessage(`⛔ @${senderId.split('@')[0]} +18 içerik attığı için banlandı (${nsfwReason}).`, { mentions: [senderId] });
                         return true;
                     }
                 }
@@ -49,24 +54,30 @@ class ModerationService {
         // 2. Content Filter
         const violation = this.checkContent(msg.body);
         if (violation) {
+            console.log(`[MOD] Detected violation: "${violation}" from ${userLogName}`);
+
             try {
                 // Delete
                 await msg.delete(true);
+                console.log(`[MOD] Message deleted from ${userLogName}`);
 
                 // Warn (Strike System)
                 const result = await StrikeService.addStrike(senderId, chat.id._serialized, `Used banned word: ${violation}`);
+                console.log(`[MOD] Strike added to ${userLogName}. Total: ${result.strikeCount}`);
 
-                await chat.sendMessage(`⚠️ @${senderId.split('@')[0]} Warning Issued!\nReason: Profanity/Banned Word\nStrikes: ${result.strikeCount}/3`, {
+                await chat.sendMessage(`⚠️ @${senderId.split('@')[0]} Uyarıldı!\nSebep: Yasaklı Kelime/Küfür\nUyarı Sayısı: ${result.strikeCount}/3`, {
                     mentions: [senderId]
                 });
 
                 if (result.strikeCount >= 3) {
                     await chat.removeParticipants([senderId]);
-                    await chat.sendMessage(`🚫 @${senderId.split('@')[0]} banned for reaching 3 strikes.`, { mentions: [senderId] });
+                    console.log(`[MOD] Banned ${userLogName} for reaching 3 strikes.`);
+                    await chat.sendMessage(`🚫 @${senderId.split('@')[0]} 3 uyarı sınırına ulaştığı için gruptan atıldı.`, { mentions: [senderId] });
                 }
 
             } catch (e) {
-                console.error("Failed to moderate message", e);
+                console.error("[MOD] Failed to execute moderation action:", e);
+                console.log("[MOD] TIP: Make sure the bot is an Admin!");
             }
             return true;
         }

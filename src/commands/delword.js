@@ -1,8 +1,8 @@
 const config = require('../../config');
 
 module.exports = {
-    name: 'delword',
-    description: 'Removes a word from the banned list.',
+    name: 'kelimesil',
+    description: 'Yasaklı kelime siler',
     adminOnly: true,
     async run(client, msg, args) {
         if (args.length === 0) return msg.reply('⚠️ Usage: !delword [word]');

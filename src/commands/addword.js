@@ -5,8 +5,8 @@ const config = require('../../config');
 // We'll update the in-memory config for now.
 
 module.exports = {
-    name: 'addword',
-    description: 'Adds a word to the banned list.',
+    name: 'kelimeekle',
+    description: 'Yasaklı kelime ekler',
     adminOnly: true,
     async run(client, msg, args) {
         if (args.length === 0) return msg.reply('⚠️ Usage: !addword [word]');

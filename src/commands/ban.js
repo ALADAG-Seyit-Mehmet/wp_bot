@@ -1,6 +1,6 @@
 module.exports = {
-    name: 'ban',
-    description: 'Bans (kicks) a user.',
+    name: 'yasakla',
+    description: 'Kullanıcıyı yasaklar',
     adminOnly: true,
     async run(client, msg, args) {
         // WhatsApp API "ban" usually just means remove, 
