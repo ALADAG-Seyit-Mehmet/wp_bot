@@ -52,6 +52,15 @@ function initSchema() {
             PRIMARY KEY (userId, groupId)
         )`);
 
+        // 5. Temporary Bans Table
+        db.run(`CREATE TABLE IF NOT EXISTS temp_bans (
+            userId TEXT NOT NULL,
+            groupId TEXT NOT NULL,
+            unbanTime INTEGER, -- Timestamp when they should be added back
+            banCount INTEGER DEFAULT 0, -- How many times they've been temp-banned
+            PRIMARY KEY (userId, groupId)
+        )`);
+
         console.log("Database schema initialized.");
     });
 }

@@ -4,7 +4,7 @@ const StrikeService = require('./StrikeService');
 // In-memory spam tracker (DB is too slow for high-freq spam checks usually, hybrid is best)
 const spamTracker = {};
 
-const MuteService = require('./MuteService');
+const BanService = require('./BanService');
 
 class ModerationService {
     static async checkMessage(client, msg) {
@@ -19,13 +19,6 @@ class ModerationService {
         const senderId = msg.author || msg.from;
         const contact = await msg.getContact();
         const userLogName = `+${contact.number} (${contact.pushname || ''})`;
-
-        // 0. MUTE CHECK (Shadow Ban)
-        if (await MuteService.isMuted(senderId, chat.id._serialized)) {
-            console.log(`[MOD] Deleting message from NUTED user: ${userLogName}`);
-            await msg.delete(true);
-            return true; // Stop processing
-        }
 
         // 1. Anti-Spam Check
         if (this.isSpam(senderId)) {
@@ -74,25 +67,26 @@ class ModerationService {
                 const result = await StrikeService.addStrike(senderId, chat.id._serialized, `Used banned word: ${violation}`);
                 console.log(`[MOD] Strike added to ${userLogName}. Total: ${result.strikeCount}`);
 
-                // Check Mute/Ban Threshold
+                // Check Ban Threshold
                 if (result.strikeCount >= 3) {
-                    // Check how many mute chances they have used
-                    const muteStatus = await MuteService.getMuteStatus(senderId, chat.id._serialized);
+                    // Check how many ban chances they have used
+                    const banCount = await BanService.getBanCount(senderId, chat.id._serialized);
 
-                    if (muteStatus.muteCount < config.MAX_MUTE_COUNT) {
-                        // Apply Mute (24h)
-                        await MuteService.applyMute(senderId, chat.id._serialized, config.MUTE_DURATION_MS);
-                        await StrikeService.clearStrikes(senderId, chat.id._serialized); // Reset strikes for next cycle
+                    if (banCount < config.MAX_MUTE_COUNT) {
+                        // Apply Temp Ban (24h)
+                        await BanService.tempBan(chat, senderId, config.MUTE_DURATION_MS);
+                        await StrikeService.clearStrikes(senderId, chat.id._serialized); // Reset strikes
 
-                        await chat.sendMessage(`🔇 @${senderId.split('@')[0]} 3 uyarı sınırına ulaştı.\n24 saat boyunca sessize alındı (Mesajları silinecek).\n(Kalan Hak: ${config.MAX_MUTE_COUNT - muteStatus.muteCount - 1})`, {
+                        // Note: User is kicked, so we can't really mention them effectively inside the group.
+                        await chat.sendMessage(`🚫 @${senderId.split('@')[0]} 3 uyarı sınırına ulaştı.\n24 saatliğine gruptan uzaklaştırıldı. Süre bitince otomatik eklenecek.\n(Kalan Hak: ${config.MAX_MUTE_COUNT - banCount - 1})`, {
                             mentions: [senderId]
                         });
-                        console.log(`[MOD] Muted ${userLogName} for 24h.`);
+                        console.log(`[MOD] Temp banned ${userLogName} for 24h.`);
                     } else {
-                        // All chances used -> KICK
+                        // All chances used -> PERMA KICK
                         await chat.removeParticipants([senderId]);
-                        console.log(`[MOD] Banned ${userLogName} for exhausting all mute chances.`);
-                        await chat.sendMessage(`🚫 @${senderId.split('@')[0]} 3 kez susturulduğu halde devam ettiği için gruptan atıldı.`, { mentions: [senderId] });
+                        console.log(`[MOD] Perma banned ${userLogName} for exhausting all chances.`);
+                        await chat.sendMessage(`⛔ @${senderId.split('@')[0]} 3 kez uzaklaştırıldığı halde devam ettiği için kalıcı olarak atıldı.`, { mentions: [senderId] });
                     }
                 } else {
                     // Just warn

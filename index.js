@@ -84,6 +84,13 @@ client.on('ready', () => {
     console.log('------------------------------------------------');
     // Set Discord-like Presence
     client.setStatus('online');
+
+    // 3. Start Ban Checker Loop (Every 60s)
+    const BanService = require('./src/services/BanService');
+    setInterval(() => {
+        BanService.checkExpiredBans(client);
+    }, 60000);
+    console.log('[SYSTEM] Ban Checker Loop Started (60s interval).');
 });
 
 // --- Join Request Gatekeeper ---
