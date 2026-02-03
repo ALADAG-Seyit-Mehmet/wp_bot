@@ -18,8 +18,15 @@ const client = new Client({
             '--disable-accelerated-2d-canvas',
             '--no-first-run',
             '--no-zygote',
+            '--single-process', // Warning: may be unstable but huge RAM saver
             '--disable-gpu',
-            '--disable-extensions'
+            '--disable-extensions',
+            '--disable-component-update',
+            '--disable-default-apps',
+            '--mute-audio',
+            '--no-default-browser-check',
+            '--disable-web-security',
+            '--disable-features=IsolateOrigins,site-per-process', // Low memory mode
         ],
     },
     // Force a specific version to prevent "Context Destroyed" errors
