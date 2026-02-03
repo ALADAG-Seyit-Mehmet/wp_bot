@@ -12,6 +12,7 @@ const client = new Client({
         headless: os.platform() !== 'win32',
         executablePath: os.platform() === 'win32' ? undefined : '/usr/bin/chromium-browser',
         protocolTimeout: 240000,
+        timeout: 0, // Disable launch timeout (default 30s)
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -35,7 +36,7 @@ const client = new Client({
         type: 'remote',
         remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html',
     },
-    authTimeoutMs: 60000,
+    authTimeoutMs: 300000, // 5 minutes
     loadingScreen: true
 });
 
