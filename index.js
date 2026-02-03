@@ -11,6 +11,7 @@ const client = new Client({
         // Headless TRUE on Linux (Server), FALSE on Windows (Validation)
         headless: os.platform() !== 'win32',
         executablePath: os.platform() === 'win32' ? undefined : '/usr/bin/chromium-browser',
+        protocolTimeout: 240000,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -18,7 +19,7 @@ const client = new Client({
             '--disable-accelerated-2d-canvas',
             '--no-first-run',
             '--no-zygote',
-            '--single-process', // Warning: may be unstable but huge RAM saver
+            // '--single-process', // REMOVED: Causing ProtocolError timeouts
             '--disable-gpu',
             '--disable-extensions',
             '--disable-component-update',
