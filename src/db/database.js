@@ -43,6 +43,15 @@ function initSchema() {
             spamThreshold INTEGER DEFAULT 5
         )`);
 
+        // 4. Muted Users Table
+        db.run(`CREATE TABLE IF NOT EXISTS muted_users (
+            userId TEXT NOT NULL,
+            groupId TEXT NOT NULL,
+            muteEndTime INTEGER, -- Timestamp when mute expires
+            muteCount INTEGER DEFAULT 0, -- How many times they've been muted
+            PRIMARY KEY (userId, groupId)
+        )`);
+
         console.log("Database schema initialized.");
     });
 }

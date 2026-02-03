@@ -109,6 +109,10 @@ module.exports = {
     SPAM_THRESHOLD: 5,
     SPAM_TIME_WINDOW: 10000,
 
+    // Mute Settings
+    MUTE_DURATION_MS: 24 * 60 * 60 * 1000, // 24 Hours
+    MAX_MUTE_COUNT: 3, // Max 3 mutes (chances) before permanent kick
+
     // Messages
     WELCOME_MESSAGE: "Hoşgeldin! Kurallara uymayı unutma. Ağır küfür, +18 ve siyaset YASAKTIR.",
     WARNING_MESSAGE: "⚠️ Bu grupta ağır küfür, siyaset ve +18 içerik yasaktır.",
