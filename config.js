@@ -28,7 +28,7 @@ module.exports = {
 
         // --- A-Word Elements ---
         "amcık", "amcik", "amc!k", "amc1k",
-        "amın", "amina", "amına", "am1na", "am!na", "amk",
+        "amın", "amina", "amına", "am1na", "am!na", "amk", "aq", "aw", "mk", "mq",
         "anani", "ananı", "anan1", "anana", "bacını", "bacini",
         "yarrak", "y4rrak", "y4rak", "yarram", "yarrram",
 
