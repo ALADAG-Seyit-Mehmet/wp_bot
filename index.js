@@ -152,7 +152,14 @@ client.on('group_join', async (notification) => {
 
 client.on('message', async (msg) => {
     try {
-        const chat = await msg.getChat();
+        let chat;
+        try {
+            chat = await msg.getChat();
+        } catch (e) {
+            console.error(`[ERROR] Failed to get chat for message. Probably a Channel/Newsletter. Skipping. Error: ${e.message}`);
+            return;
+        }
+
         const contact = await msg.getContact();
 
         // DEBUG LOGGING
