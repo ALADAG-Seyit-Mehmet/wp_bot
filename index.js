@@ -10,6 +10,7 @@ const client = new Client({
     puppeteer: {
         // Headless TRUE on Linux (Server), FALSE on Windows (Validation)
         headless: os.platform() !== 'win32',
+        executablePath: os.platform() === 'win32' ? undefined : '/usr/bin/chromium-browser',
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -17,7 +18,8 @@ const client = new Client({
             '--disable-accelerated-2d-canvas',
             '--no-first-run',
             '--no-zygote',
-            '--disable-gpu'
+            '--disable-gpu',
+            '--disable-extensions'
         ],
     },
     // Force a specific version to prevent "Context Destroyed" errors
