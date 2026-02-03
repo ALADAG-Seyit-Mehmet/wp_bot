@@ -6,7 +6,7 @@ sudo apt update && sudo apt upgrade -y
 
 # 2. Install Node.js (v18)
 echo "Installing Node.js..."
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs
 
 # 3. Install Libraries for Puppeteer (Chrome)
