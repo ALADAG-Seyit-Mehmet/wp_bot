@@ -21,4 +21,18 @@ sudo npm install -g pm2
 echo "Installing Bot Dependencies..."
 npm install
 
+# 6. Create Swap File (Virtual RAM) - Crucial for 1GB RAM VPS
+echo "Configuring Swap Space..."
+# Check if swap exists to avoid duplicates
+if [ ! -f /swapfile ]; then
+    sudo fallocate -l 4G /swapfile
+    sudo chmod 600 /swapfile
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
+    echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+    echo "✅ 4GB Swap created."
+else
+    echo "ℹ️ Swap file already exists."
+fi
+
 echo "✅ Setup Complete. Run 'pm2 start index.js --name bot' to start."
