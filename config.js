@@ -13,8 +13,6 @@ module.exports = {
     // Moderation Lists - HEAVY PROFANITY ONLY (Mild insults removed)
     BANNED_WORDS: [
         // --- High Priority (Shorts) ---
-        "aq", "amk", "mk", "mq", "awk", "a.q", "a.m.k", "a.k",
-        "@q", "@mk", "@mq", "4mk", "4q", "aqk", "amq",
         "sie", "s.i.e", "si.e", "siktirgit", "siktir git",
 
         // --- Variatons of OÇ ---
