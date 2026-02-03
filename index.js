@@ -12,7 +12,7 @@ const client = new Client({
         headless: os.platform() !== 'win32',
         executablePath: os.platform() === 'win32' ? undefined : '/usr/bin/chromium-browser',
         protocolTimeout: 240000,
-        timeout: 0, // Disable launch timeout (default 30s)
+        timeout: 300000, // 5 minutes launch timeout
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
