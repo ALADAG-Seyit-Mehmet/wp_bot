@@ -18,7 +18,8 @@ module.exports = {
         // --- Variatons of OÇ ---
         "oç", "oc", "o.ç", "o.c", "0ç", "0c", "o ç", "o c",
         "orospu", "orospu cocugu", "orospu çocuğu", "o.çocuğu", "o.cocugu",
-        "oro5pu", "0rospu", "or0spu", "orospw", "evladı", "veledi zina",
+        "orosbu", "0rosbu", "or0sbu", "or0spu", "oro5pu", "0rospu", "orospw",
+        "evladı", "veledi zina",
 
         // --- S-Word Variations ---
         "sik", "s1k", "s!k", "skim", "sık", "s1k",
