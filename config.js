@@ -67,8 +67,8 @@ module.exports = {
     ],
 
     // Spam Settings
-    SPAM_THRESHOLD: 5,
-    SPAM_TIME_WINDOW: 10000,
+    SPAM_THRESHOLD: 6, // > 6 messages
+    SPAM_TIME_WINDOW: 5000, // 5 seconds
 
     // Mute Settings
     MUTE_DURATION_MS: 24 * 60 * 60 * 1000, // 24 Hours

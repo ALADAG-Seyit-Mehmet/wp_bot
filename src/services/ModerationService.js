@@ -21,11 +21,14 @@ class ModerationService {
         const userLogName = `+${contact.number} (${contact.pushname || ''})`;
 
         // 1. Anti-Spam Check
-        if (this.isSpam(senderId)) {
+        // Pass body and type to tracker
+        const spamType = this.isSpam(senderId, msg.body, msg.type);
+        if (spamType) {
             // Instant Kick/Ban for spam
             try {
                 await chat.removeParticipants([senderId]);
-                await chat.sendMessage(`⛔ @${senderId.split('@')[0]} spam yaptığı için atıldı.`, { mentions: [senderId] });
+                const reason = spamType === 'media_spam' ? "ard arda medya gönderdiği" : "aynı mesajı tekrarladığı";
+                await chat.sendMessage(`⛔ @${senderId.split('@')[0]} spam yaptığı için (${reason}) atıldı.`, { mentions: [senderId] });
             } catch (e) {
                 console.error("Failed to kick spammer", e);
             }
@@ -105,22 +108,43 @@ class ModerationService {
         return false;
     }
 
-    static isSpam(userId) {
+    static isSpam(userId, messageBody, messageType) {
         const now = Date.now();
         if (!spamTracker[userId]) {
-            spamTracker[userId] = { count: 1, start: now };
-            return false;
+            spamTracker[userId] = [];
         }
 
-        const data = spamTracker[userId];
-        if (now - data.start > 10000) { // 10 seconds window
-            data.count = 1;
-            data.start = now;
-            return false;
-        }
+        const history = spamTracker[userId];
 
-        data.count++;
-        if (data.count > 6) return true; // threshold > 5
+        // 1. Add current message
+        history.push({
+            time: now,
+            body: messageBody || '',
+            type: messageType // 'image', 'video', 'chat', etc.
+        });
+
+        // 2. Filter out old messages (keep only within window)
+        // Optimization: We could just shift(), but filter is safer for edge cases
+        const validHistory = history.filter(msg => (now - msg.time) < config.SPAM_TIME_WINDOW);
+        spamTracker[userId] = validHistory;
+
+        // 3. Analyze for Spam
+        const count = validHistory.length;
+
+        // A. Media Spam Check (>6 media items in window)
+        // image, video, sticker, audio, voice...
+        const mediaCount = validHistory.filter(msg =>
+            msg.type === 'image' || msg.type === 'video' || msg.type === 'sticker' || msg.type === 'audio' || msg.type === 'ptt'
+        ).length;
+
+        if (mediaCount > config.SPAM_THRESHOLD) return 'media_spam';
+
+        // B. Repeated Text Spam Check (>6 identical messages in window)
+        // Group by body
+        if (messageBody && messageType === 'chat') {
+            const sameContentCount = validHistory.filter(msg => msg.body === messageBody).length;
+            if (sameContentCount > config.SPAM_THRESHOLD) return 'text_spam';
+        }
 
         return false;
     }

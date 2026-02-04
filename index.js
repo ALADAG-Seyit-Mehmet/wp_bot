@@ -159,6 +159,11 @@ client.on('group_join', async (notification) => {
 
 client.on('message', async (msg) => {
     try {
+        // Ignore Broadcasts / Status Updates / Newsletters to prevent "getChat" errors
+        if (msg.from.includes('status@broadcast') || msg.from.includes('newsletter') || msg.type === 'e2e_notification' || msg.type === 'protocol' || msg.from.includes('@newsletter')) {
+            return;
+        }
+
         let chat;
         try {
             chat = await msg.getChat();
