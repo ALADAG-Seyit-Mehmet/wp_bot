@@ -130,19 +130,25 @@ class ModerationService {
         const lower = text.toLowerCase();
 
         const allBadWords = [
-            ...config.BANNED_WORDS,
-            ...config.ADULT_WORDS,
-            ...config.POLITICAL_WORDS
+            ...(config.FAMILY_INSULTS || []),
+            ...(config.NATIONAL_INSULTS || []),
+            ...(config.RELIGIOUS_INSULTS || []),
+            ...(config.POLITICAL_PARTIES || []),
+            ...(config.ADULT_CONTENT || [])
         ];
 
         for (const word of allBadWords) {
             const badWord = word.toLowerCase();
 
-            // Check 1: Exact match with word boundaries (avoids "götür" triggering "göt")
-            // \b matches start/end of alphanumeric word. 
-            // We escape special chars just in case.
+            // Check 1: Exact match with custom word boundaries for Turkish support
+            // We use lookbehind and lookahead to ensure the word is NOT preceded or followed by a letter (including Turkish chars)
+            // (?<![a-zA-Z0-9çğıöşüÇĞIİÖŞÜ]) matches a position where the previous char is NOT a letter
+            // (?![a-zA-Z0-9çğıöşüÇĞIİÖŞÜ]) matches a position where the next char is NOT a letter
+
             const escapedWord = badWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            const regex = new RegExp(`\\b${escapedWord}\\b`, 'i');
+            // Note: JS doesn't support lookbehind broadly in older environments, but Node 10+ does. 
+            // If environment is very old, we might need a workaround, but standard Node is fine.
+            const regex = new RegExp(`(?<![a-zA-Z0-9çğıöşüÇĞIİÖŞÜ])${escapedWord}(?![a-zA-Z0-9çğıöşüÇĞIİÖŞÜ])`, 'i');
 
             if (regex.test(lower)) {
                 return badWord;

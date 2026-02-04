@@ -11,73 +11,33 @@ module.exports = {
     ALLOWED_PREFIXES: ["90", "994", "993", "998", "996", "76", "77"],
 
     // Moderation Lists - HEAVY PROFANITY ONLY (Mild insults removed)
-    BANNED_WORDS: [
-        // --- High Priority (Shorts) ---
-        "sie", "s.i.e", "si.e", "siktirgit", "siktir git",
-
-        // --- Variatons of OÇ ---
+    // Moderation Lists - VALUES BASED (Milli, Dini, Ailevi)
+    // 1. Family Values (Ailevi) - Targeting lineage/mothers
+    FAMILY_INSULTS: [
+        "ananı", "anani", "anan1", "anana",
+        "bacını", "bacini",
+        "karını", "avradını",
+        "sülaleni",
         "oç", "oc", "o.ç", "o.c", "0ç", "0c", "o ç", "o c",
-        "orospu", "orospu cocugu", "orospu çocuğu", "o.çocuğu", "o.cocugu",
-        "orosbu", "0rosbu", "or0sbu", "or0spu", "oro5pu", "0rospu", "orospw",
-        "evladı", "veledi zina",
-
-        // --- S-Word Variations ---
-        "sik", "s1k", "s!k", "skim", "sık", "s1k",
-        "siktir", "siktır", "s1ktir", "s!ktir", "siktr", "s.k",
-        "sikerim", "s1kerim", "s.ikerim", "s.kerim", "sikem",
-        "sokarım", "sakarım", "sokayım", "sokam", "s0karım", "sokuk", "yarak",
-
-        // --- A-Word Elements ---
-        "amcık", "amcik", "amc!k", "amc1k",
-        "amın", "amina", "amına", "am1na", "am!na",
-        "anani", "ananı", "anan1", "anana", "bacını", "bacini",
-        "yarrak", "y4rrak", "y4rak", "yarram", "yarrram",
-
-        // --- Insults (Person) ---
-        "piç", "pic", "p!ç", "p1ç", "p.i.c", "piç kurusu",
-        "göt", "got", "g0t", "g.o.t", "g.ö.t", "götveren", "götoş",
-        "gavat", "kavat", "g4vat",
-        "ibne", "1bne", "ibn3", "puşt",
-        "kahpe", "k4hpe",
-        "kaltak", "k4ltak",
-        "yavşak", "yavsak", "y4vşak",
-        "dalyarak",
-        "pezevenk", "pezeveng",
-        "beyinsiz", "gerizekalı", "aptal", "salak", "mal", "keko", "yıkık", "ezik", // Community choice: sometimes valid insults
-
-        // --- Religious / Values Insults (Extreme) ---
-        "allahını", "allahini", "kitabını", "kitabini", "dinini", "imanını", // Usually preceded by curse
-        "atatürk'e", "ataturke", "ataturk'e", // Disrespect checks usually complex but banning specific insult phrases helps
-
-        // --- English Common ---
-        "fuck", "shit", "bitch", "asshole", "dick", "cunt", "pussy", "bastard", "whore", "slut"
+        "orospu çocuğu", "orospu cocugu", "o.çocuğu", "o.cocugu",
+        "neslini", "zürriyetini",
+        "piç", // Often aimed at lineage, kept for safety
+        "yavşak" // Often aimed at character/lineage
     ],
 
-    ADULT_WORDS: [
-        "+18", "nsfw", "porn", "porno", "p0rno", "p0rn",
-        "sex", "seks", "s3x", "s.e.x",
-        "sikiş", "sikis", "s1k1s",
-        "ifşa", "ifsa", "1fşa",
-        "nude", "nudes", "nud",
-        "çıplak", "ciplak", "c1plak",
-        "erotik", "er0tik",
-        "brazzer", "brazzers",
-        "xnxx", "xvideos", "pornhub", "hub",
-        "kucak",
-        "azgın", "azgin",
-        "swinger", "escort", "eskort"
+    // 2. National Values (Milli) - Terror, Treason, Hate against State
+    NATIONAL_INSULTS: [
+        "pkk", "p.k.k", "apo", "ap0",
+        "fetö", "feto",
+        "ypg", "pyd",
+        "dhkp-c", "dhkpc",
+        "işid", "isid", "deaş", "daeş",
+        "terör", "teror", "terörist",
+        "bölücü"
     ],
 
-    POLITICAL_WORDS: [
-        // --- Government & General ---
-        "siyaset", "s1yaset",
-        "hükümet", "hukumet",
-        "devlet", "bakan", "başkan",
-        "seçim", "secim", "tek adam",
-        "sandık", "darbe", "eylem", "miting",
-        "propaganda",
-
-        // --- Parties ---
+    // 2.1 Political Parties (Siyaset Yasağı request)
+    POLITICAL_PARTIES: [
         "akp", "ak parti", "a.k.p",
         "chp", "c.h.p", "cehape",
         "mhp", "m.h.p",
@@ -85,24 +45,25 @@ module.exports = {
         "iyi parti", "iyip",
         "deva", "gelecek", "zafer partisi", "memleket partisi",
         "hüda par", "hudapar",
+        "yeniden refah"
+    ],
 
-        // --- Organizations ---
-        "fetö", "feto", "fg",
-        "pkk", "p.k.k", "apo",
-        "ypg", "pyd",
-        "dhkp-c", "dhkpc",
-        "işid", "isid", "deaş", "daeş",
-        "terör", "teror", "terörist",
+    // 3. Religious Values (Dini) - Explicit insults to sacred values
+    RELIGIOUS_INSULTS: [
+        "allahını", "allahini",
+        "kitabını", "kitabini",
+        "dinini", "imanını",
+        "peygamberini"
+        // Generic "Allah" is allowed (e.g., "Allah razı olsun"). only possessive insult forms are banned.
+    ],
 
-        // --- Politicians ---
-        "erdoğan", "erdogan", "tayyip", "rte",
-        "kılıçdaroğlu", "kilicdaroglu", "kk", "bay kemal",
-        "imamoğlu", "imamoglu", "ekrem",
-        "mansur yavaş", "mansur",
-        "bahçeli", "devlet bahçeli",
-        "akşener", "meral",
-        "özdağ", "ümit özdağ",
-        "demirtaş", "selo"
+    // 4. Adult/Illegal Content (Spam protection) 
+    // Kept to prevent ban from WhatsApp (Account safety)
+    ADULT_CONTENT: [
+        "+18", "cp", "child porn",
+        "porno", "p0rno",
+        "escort", "eskort",
+        "sikiş izle", "sex izle" // Specific phrases to avoid banning "sikiş" related chat
     ],
 
     // Spam Settings
