@@ -6,9 +6,11 @@ module.exports = {
         "Türk Oyuncular Derneği🇹🇷"
     ],
 
-    // Auto-Approve Settings (Gatekeeper)
-    // 90 (TR), 994 (AZ), 993 (TM), 998 (UZ), 996 (KG), 76/77 (KZ)
+    // Allowed prefixes for joining
     ALLOWED_PREFIXES: ["90", "994", "993", "998", "996", "76", "77"],
+
+    // Feature Flags
+    ENABLE_AI_MODERATION: false, // Set to true to enable heavy image analysis (high CPU/RAM usage)
 
     // Moderation Lists - HEAVY PROFANITY ONLY (Mild insults removed)
     // Moderation Lists - VALUES BASED (Milli, Dini, Ailevi)
@@ -71,7 +73,7 @@ module.exports = {
     SPAM_TIME_WINDOW: 5000, // 5 seconds
 
     // Mute Settings
-    MUTE_DURATION_MS: 5000, // 5 Seconds (TEST MODE)
+    MUTE_DURATION_MS: 24 * 60 * 60 * 1000, // 24 Hours
     MAX_MUTE_COUNT: 3, // Max 3 mutes (chances) before permanent kick
 
     // Messages

@@ -89,7 +89,7 @@ client.on('ready', () => {
     const BanService = require('./src/services/BanService');
     setInterval(() => {
         BanService.checkExpiredBans(client);
-    }, 5000); // 5 seconds check (TEST MODE)
+    }, 60000); // 60 seconds check
     console.log('[SYSTEM] Ban Checker Loop Started (60s interval).');
 });
 
