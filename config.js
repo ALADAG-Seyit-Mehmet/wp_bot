@@ -71,7 +71,7 @@ module.exports = {
     SPAM_TIME_WINDOW: 5000, // 5 seconds
 
     // Mute Settings
-    MUTE_DURATION_MS: 24 * 60 * 60 * 1000, // 24 Hours
+    MUTE_DURATION_MS: 5000, // 5 Seconds (TEST MODE)
     MAX_MUTE_COUNT: 3, // Max 3 mutes (chances) before permanent kick
 
     // Messages
