@@ -20,7 +20,6 @@ const client = new Client({
             '--disable-accelerated-2d-canvas',
             '--no-first-run',
             '--no-zygote',
-            // '--single-process', // REMOVED: Causing ProtocolError timeouts
             '--disable-gpu',
             '--disable-extensions',
             '--disable-component-update',
@@ -28,7 +27,17 @@ const client = new Client({
             '--mute-audio',
             '--no-default-browser-check',
             '--disable-web-security',
-            '--disable-features=IsolateOrigins,site-per-process', // Low memory mode
+            '--disable-features=IsolateOrigins,site-per-process',
+            // Extra Stability Flags
+            '--disable-client-side-phishing-detection',
+            '--disable-hang-monitor',
+            '--disable-popup-blocking',
+            '--disable-prompt-on-repost',
+            '--disable-sync',
+            '--metrics-recording-only',
+            '--safebrowsing-disable-auto-update',
+            '--password-store=basic',
+            '--use-mock-keychain'
         ],
     },
     // Force a specific version to prevent "Context Destroyed" errors
@@ -36,7 +45,7 @@ const client = new Client({
         type: 'remote',
         remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html',
     },
-    authTimeoutMs: 300000, // 5 minutes
+    authTimeoutMs: 300000,
     loadingScreen: true
 });
 
@@ -148,8 +157,9 @@ client.on('group_join', async (notification) => {
         const contact = await client.getContactById(notification.id.participant);
         const welcomeMsg = `👋 Hoşgeldin @${contact.id.user}, *${chat.name}* grubumuza!\n\nLütfen kuralları okumak için *!kurallar* komutunu kullanmayı unutma. Keyifli sohbetler! 😊`;
 
+        // FIXED: Use contact.id._serialized instead of contact object to avoid deprecation warning
         await chat.sendMessage(welcomeMsg, {
-            mentions: [contact]
+            mentions: [contact.id._serialized]
         });
         console.log(`[JOIN] Welcomed ${contact.number} to ${chat.name}`);
     } catch (err) {
