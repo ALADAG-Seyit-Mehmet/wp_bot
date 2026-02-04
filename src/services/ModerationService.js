@@ -7,6 +7,12 @@ const spamTracker = {};
 const BanService = require('./BanService');
 
 class ModerationService {
+    static isBotAdmin(chat, client) {
+        const botId = client.info.wid._serialized;
+        const participant = chat.participants.find(p => p.id._serialized === botId);
+        return participant && (participant.isAdmin || participant.isSuperAdmin);
+    }
+
     static async checkMessage(client, msg) {
         const chat = await msg.getChat();
 
@@ -25,6 +31,12 @@ class ModerationService {
         const spamType = this.isSpam(senderId, msg.body, msg.type);
         if (spamType) {
             // Instant Kick/Ban for spam
+            if (!this.isBotAdmin(chat, client)) {
+                console.warn(`[MOD] Cannot kick spammer ${userLogName}: Bot is not Admin.`);
+                await chat.sendMessage("⚠️ Spam algılandı ancak bot Admin olmadığı için müdahale edemiyor.");
+                return true;
+            }
+
             try {
                 await chat.removeParticipants([senderId]);
                 const reason = spamType === 'media_spam' ? "ard arda medya gönderdiği" : "aynı mesajı tekrarladığı";
@@ -36,7 +48,7 @@ class ModerationService {
         }
 
         // 2. Visual Moderation (AI)
-        if (msg.hasMedia) {
+        if (msg.hasMedia && config.ENABLE_AI_MODERATION) {
             try {
                 const media = await msg.downloadMedia();
                 if (media && (media.mimetype.startsWith('image/') || media.mimetype.startsWith('sticker'))) {
@@ -45,9 +57,14 @@ class ModerationService {
 
                     if (nsfwReason) {
                         await msg.delete(true);
+
                         // Instant Ban for Porn
-                        await chat.removeParticipants([senderId]);
-                        await chat.sendMessage(`⛔ @${senderId.split('@')[0]} +18 içerik attığı için banlandı (${nsfwReason}).`, { mentions: [senderId] });
+                        if (!this.isBotAdmin(chat, client)) {
+                            await chat.sendMessage(`⚠️ +18 içerik silindi ancak bot Admin olmadığı için kullanıcı atılamadı.`);
+                        } else {
+                            await chat.removeParticipants([senderId]);
+                            await chat.sendMessage(`⛔ @${senderId.split('@')[0]} +18 içerik attığı için banlandı (${nsfwReason}).`, { mentions: [senderId] });
+                        }
                         return true;
                     }
                 }
@@ -63,7 +80,10 @@ class ModerationService {
 
             try {
                 // Delete
-                await msg.delete(true);
+                // Check if admin only if explicit delete fails? Usually delete works if participant, but kick needs admin.
+                try { await msg.delete(true); }
+                catch (e) { console.log("[MOD] Could not delete msg - likely not Admin"); }
+
                 console.log(`[MOD] Message deleted from ${userLogName}`);
 
                 // Warn (Strike System)
@@ -77,6 +97,12 @@ class ModerationService {
 
                     if (banCount < config.MAX_MUTE_COUNT) {
                         // Apply Temp Ban (24h)
+                        // Temp ban logic (remove -> wait -> add) ALSO needs admin to remove.
+                        if (!this.isBotAdmin(chat, client)) {
+                            await chat.sendMessage(`⚠️ @${senderId.split('@')[0]} 3 uyarı sınırına ulaştı ancak bot Admin olmadığı için uzaklaştıramıyor.`);
+                            return true;
+                        }
+
                         await BanService.tempBan(chat, senderId, config.MUTE_DURATION_MS);
                         await StrikeService.clearStrikes(senderId, chat.id._serialized); // Reset strikes
 
@@ -87,6 +113,11 @@ class ModerationService {
                         console.log(`[MOD] Temp banned ${userLogName} for 24h.`);
                     } else {
                         // All chances used -> PERMA KICK
+                        if (!this.isBotAdmin(chat, client)) {
+                            await chat.sendMessage(`⚠️ @${senderId.split('@')[0]} kalıcı banlanmalı ancak bot Admin değil.`);
+                            return true;
+                        }
+
                         await chat.removeParticipants([senderId]);
                         console.log(`[MOD] Perma banned ${userLogName} for exhausting all chances.`);
                         await chat.sendMessage(`⛔ @${senderId.split('@')[0]} 3 kez uzaklaştırıldığı halde devam ettiği için kalıcı olarak atıldı.`, { mentions: [senderId] });
